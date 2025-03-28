@@ -12,6 +12,13 @@ return {
         },
         sources = {
           explorer = {
+            layout = {
+              preset = "sidebar",
+              layout = {
+                width = 0.2,
+                position = "right",
+              },
+            },
             matcher = {
               fuzzy = true, -- Enables fuzzy matching, so you can be a bit imprecise with your search terms
               smartcase = true, -- If your search term has uppercase letters, the search becomes case-sensitive
@@ -25,6 +32,7 @@ return {
       dashboard = {
         sections = {
           { section = "header" },
+          { section = "keys", gap = 1, padding = 1 },
           { section = "startup" },
         },
         preset = {
