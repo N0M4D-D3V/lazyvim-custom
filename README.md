@@ -11,6 +11,15 @@ This guide provides concise instructions on configuring LazyVim using .nvim.lua 
 
 Neovim allows for project-specific configurations using the .nvim.lua file. By placing this file in your project's root directory, you can tailor Neovim's behavior to meet the specific needs of each project.
 
+# Custom Scripts
+#### Create Nvim local config file
+Use this command in nvim for generate a local config file (`.nvim.lua`) for your current project.
+
+```lua
+:GenerateNvimConfigFile
+```
+
+
 # Keybindings Overview
 
 #### Window Navigation

@@ -2,6 +2,8 @@
 require("config.lazy")
 require("config.keymaps")
 
+require("config.nvim_config_template")
+
 vim.opt.encoding = "utf-8"
 vim.opt.fileencoding = "utf-8"
 vim.g.lazyvim_check_order = false
@@ -11,7 +13,7 @@ vim.o.exrc = true
 -- Prevent unsafe commands in local configs
 vim.o.secure = true
 
-vim.cmd([[colorscheme tokyonight-day]])
+vim.cmd([[colorscheme tokyonight]])
 
 -- load .nvim.lua if exists in the project
 local local_config = vim.fn.getcwd() .. "/.nvim.lua"

@@ -2,9 +2,28 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 
--- format docs with (CTRL+SHIFT+F)
--- vim.api.nvim_set_keymap('n', '<C-S-f>', ':Format<CR>', { noremap = true, silent = true })
+--
+-- ██   ██ ███████ ██    ██ ███████
+-- ██  ██  ██       ██  ██  ██
+-- █████   █████     ████   ███████
+-- ██  ██  ██         ██         ██
+-- ██   ██ ███████    ██    ███████
+--
 
+-- backstick
+vim.keymap.set("i", "<C-q>", "`", { desc = "Insert backtick" })
+
+--
+--  █████   ██████ ████████ ██  ██████  ███    ██ ███████
+--  ██   ██ ██         ██    ██ ██    ██ ████   ██ ██
+--  ███████ ██         ██    ██ ██    ██ ██ ██  ██ ███████
+--  ██   ██ ██         ██    ██ ██    ██ ██  ██ ██      ██
+--  ██   ██  ██████    ██    ██  ██████  ██   ████ ███████
+--
+
+-- Save file
+vim.api.nvim_set_keymap("n", "<C-S-s>", ":w<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("i", "<C-S-s>", "<Esc>:w<CR>a", { noremap = true, silent = true })
 -- open or focus integrated Term (CTRL+SHIFT+T)
 vim.keymap.set("n", "<leader>t", function()
   local terminals = {}
@@ -27,30 +46,55 @@ vim.keymap.set("n", "<leader>t", function()
   vim.cmd("startinsert")
 end, { noremap = true, silent = true, desc = "Open/focus integrated terminal" })
 
--- focus active editor (CTRL+SHIFT+E)
--- vim.api.nvim_set_keymap('n', '<C-S-e>', '<C-w>p', { noremap = true, silent = true })
+--
+-- ██████  ██    ██ ███████ ███████ ███████ ██████  ███████
+-- ██   ██ ██    ██ ██      ██      ██      ██   ██ ██
+-- ██████  ██    ██ █████   █████   █████   ██████  ███████
+-- ██   ██ ██    ██ ██      ██      ██      ██   ██      ██
+-- ██████   ██████  ██      ██      ███████ ██   ██ ███████
+--
 
--- Ctrl + v para pegar en
-vim.keymap.set({ "n", "v" }, "<C-v>", '"+p', { noremap = true, silent = true })
-vim.keymap.set("i", "<C-v>", "<C-r>+", { noremap = true, silent = true })
-
--- Enfocar la ventana a la dcha/izqda (Ctrl+Shift+Right)(Ctrl+Shift+Left)
+-- Focus on Left/Right buffer
 vim.api.nvim_set_keymap("n", "<C-S-Right>", "<C-w>l", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<C-S-Left>", "<C-w>h", { noremap = true, silent = true })
 
--- Save file
-vim.api.nvim_set_keymap("n", "<C-S-s>", ":w<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("i", "<C-S-s>", "<Esc>:w<CR>a", { noremap = true, silent = true })
+-- next/prev buffer
+vim.keymap.set("n", "<C-Right>", "<cmd>bnext<CR>", { desc = "Next buffer" })
+vim.keymap.set("n", "<C-Left>", "<cmd>bprevious<CR>", { desc = "Prev buffer" })
 
--- Ir al inicio/fin de la línea
+--
+--  ██████ ██      ██ ██████  ██████   ██████   █████  ██████  ██████
+--  ██      ██      ██ ██   ██ ██   ██ ██    ██ ██   ██ ██   ██ ██   ██
+--  ██      ██      ██ ██████  ██████  ██    ██ ███████ ██████  ██   ██
+--  ██      ██      ██ ██      ██   ██ ██    ██ ██   ██ ██   ██ ██   ██
+--   ██████ ███████ ██ ██      ██████   ██████  ██   ██ ██   ██ ██████
+--
+-- For UNDO/REDO Work add stty susp undef to your .bashrc/.zshrc/.bash_profile
+
+-- COPY
+vim.keymap.set({ "n", "v" }, "<C-v>", '"+p', { noremap = true, silent = true })
+vim.keymap.set({ "n", "i" }, "<C-v>", "<C-r>+", { noremap = true, silent = true })
+
+-- UNDO
+vim.keymap.set({ "n", "i" }, "<C-z>", "u", { desc = "Undo" })
+
+-- REDO
+vim.keymap.set({ "n", "i" }, "<C-y>", "<C-r>", { desc = "Redo" })
+
+--
+-- ███    ███  ██████  ██    ██ ███████ ███    ███ ███████ ███    ██ ████████
+-- ████  ████ ██    ██ ██    ██ ██      ████  ████ ██      ████   ██    ██
+-- ██ ████ ██ ██    ██ ██    ██ █████   ██ ████ ██ █████   ██ ██  ██    ██
+-- ██  ██  ██ ██    ██  ██  ██  ██      ██  ██  ██ ██      ██  ██ ██    ██
+-- ██      ██  ██████    ████   ███████ ██      ██ ███████ ██   ████    ██
+--
+
+-- Go to start/end of line
 vim.api.nvim_set_keymap("i", "<C-S-Left>", "<C-o>^", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("i", "<C-S-Right>", "<C-o>$", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("v", "<C-S-Left>", "^", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("v", "<C-S-Right>", "g_", { noremap = true, silent = true })
 
--- Mover hacia arriba/abajo
+-- Move Up/Down
 vim.api.nvim_set_keymap("i", "<C-S-Up>", "<Esc>:m .-2<CR>==gi", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("i", "<C-S-Down>", "<Esc>:m .+1<CR>==gi", { noremap = true, silent = true })
-
-vim.api.nvim_set_keymap("v", "<C-S-Up>", ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<C-S-Down>", ":m '>+1<CR>gv=gv", { noremap = true, silent = true })
