@@ -71,7 +71,12 @@ vim.keymap.set("n", "<C-Left>", "<cmd>bprevious<CR>", { desc = "Prev buffer" })
 --
 -- For UNDO/REDO Work add stty susp undef to your .bashrc/.zshrc/.bash_profile
 
--- COPY
+-- COPY/PASTE
+vim.keymap.set("n", "<C-c>", '"+y')
+vim.keymap.set("v", "<C-c>", '"+y')
+
+vim.keymap.set("v", "<C-x>", '"+d')
+
 vim.keymap.set({ "n", "v" }, "<C-v>", '"+p', { noremap = true, silent = true })
 vim.keymap.set({ "n", "i" }, "<C-v>", "<C-r>+", { noremap = true, silent = true })
 
