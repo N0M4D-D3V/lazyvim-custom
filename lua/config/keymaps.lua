@@ -76,7 +76,7 @@ vim.keymap.set("n", "<Tab>", ":bnext<CR>", { desc = "Next buffer" })
 vim.keymap.set("n", "<S-Tab>", ":bprevious<CR>", { desc = "Previous buffer" })
 
 -- open vertical split of current file
-vim.keymap.set("n", "<C-S-n>", function()
+vim.keymap.set("n", "<C-n>", function()
   --si hay un vertical split, lo usa, si no, lo creamos
   vim.cmd("vsplit")
   -- carga el mismo buffer en el nuevo split
@@ -127,6 +127,12 @@ vim.keymap.set({ "n", "i" }, "<C-z>", "u", { desc = "Undo" })
 
 -- REDO
 vim.keymap.set({ "n", "i" }, "<C-y>", "<C-r>", { desc = "Redo" })
+
+-- SELECT ALL
+local opts = { noremap = true, silent = true }
+
+vim.keymap.set({ "n", "v" }, "<C-a>", "ggVG", opts)
+vim.keymap.set("i", "<C-a>", "<Esc>ggVG", opts)
 
 -- ███████████████████████████████████████████████████████████████████████████████████████████████
 --

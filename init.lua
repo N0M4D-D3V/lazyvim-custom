@@ -7,6 +7,7 @@ require("config.nvim_config_template")
 vim.opt.encoding = "utf-8"
 vim.opt.fileencoding = "utf-8"
 vim.g.lazyvim_check_order = false
+
 -- Enable local config files
 vim.o.exrc = true
 
