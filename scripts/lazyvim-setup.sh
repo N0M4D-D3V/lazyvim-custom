@@ -70,7 +70,6 @@ pip install pynvim black
 echo "[SK3L3T0R] Installing global Node tools..."
 npm install -g \
   typescript typescript-language-server \
-  @astrojs/language-server \
   vscode-langservers-extracted \
   prettier \
   bash-language-server \

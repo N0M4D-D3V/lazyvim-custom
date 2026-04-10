@@ -3,7 +3,6 @@ local mason_registry = require("mason-registry")
 local servers = {
   "pyright",
   "tsserver",
-  "astro",
   "angularls",
   "bash-language-server",
   "jdtls",
