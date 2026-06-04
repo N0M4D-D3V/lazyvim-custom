@@ -71,6 +71,12 @@ end, { noremap = true, silent = true, desc = "Open/focus integrated terminal" })
 vim.api.nvim_set_keymap("n", "<C-S-Right>", "<C-w>l", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<C-S-Left>", "<C-w>h", { noremap = true, silent = true })
 
+-- Window navigation
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window" })
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window" })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window" })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window" })
+
 -- GoTo next/prev buffer
 vim.keymap.set("n", "<Tab>", ":bnext<CR>", { desc = "Next buffer" })
 vim.keymap.set("n", "<S-Tab>", ":bprevious<CR>", { desc = "Previous buffer" })
@@ -95,20 +101,43 @@ end, { desc = "Vertical Split with current buffer" })
 -- | .bashrc/.zshrc/.bash_profile                                     |
 -- ████████████████████████████████████████████████████████████████████
 
+local function copy_current_line_to_clipboard()
+  vim.cmd('normal! "+yy')
+end
+
+local function copy_selection_to_clipboard()
+  vim.cmd('normal! "+y')
+end
+
+local function copy_current_line_from_insert()
+  local pos = vim.api.nvim_win_get_cursor(0)
+  vim.cmd("stopinsert")
+  copy_current_line_to_clipboard()
+  vim.api.nvim_win_set_cursor(0, pos)
+  vim.cmd("startinsert")
+end
+
+local function paste_into_terminal()
+  local job_id = vim.b.terminal_job_id
+  if not job_id then
+    vim.notify("No terminal job attached to this buffer", vim.log.levels.WARN)
+    return
+  end
+
+  vim.api.nvim_chan_send(job_id, vim.fn.getreg("+"))
+end
+
 -- PASTE
 vim.keymap.set("i", "<C-v>", "<C-r>+", { noremap = true, silent = true })
+vim.keymap.set("c", "<C-v>", "<C-r>+", { noremap = true, silent = true })
 vim.keymap.set("n", "<C-v>", '"+p', { noremap = true, silent = true }) -- normal mode
 vim.keymap.set("v", "<C-v>", '"+p', { noremap = true, silent = true })
+vim.keymap.set("t", "<C-v>", paste_into_terminal, { noremap = true, silent = true, desc = "Paste clipboard into terminal" })
 
 -- SMART COPY
-vim.keymap.set({ "n", "v" }, "<C-c>", function()
-  local mode = vim.fn.mode()
-  if mode:match("[vV]") then
-    vim.cmd('normal! "+y') -- copy selection
-  else
-    vim.cmd('normal! "+yy') -- copy full line
-  end
-end, { desc = "Smart Copy to Clipboard (Ctrl+C)", noremap = true, silent = true })
+vim.keymap.set("n", "<C-c>", copy_current_line_to_clipboard, { desc = "Copy line to clipboard", noremap = true, silent = true })
+vim.keymap.set({ "v", "x", "s" }, "<C-c>", copy_selection_to_clipboard, { desc = "Copy selection to clipboard", noremap = true, silent = true })
+vim.keymap.set("i", "<C-c>", copy_current_line_from_insert, { desc = "Copy line to clipboard", noremap = true, silent = true })
 
 -- SMART CUT
 vim.keymap.set({ "n", "v" }, "<C-x>", function()
