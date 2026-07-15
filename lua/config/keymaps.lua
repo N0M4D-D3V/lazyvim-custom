@@ -1,191 +1,372 @@
--- Keymaps are automatically loaded on the VeryLazy event
--- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
--- Add any additional keymaps here
-
--- ████████████████████████████████
+-- Keymaps are automatically loaded on the VeryLazy event.
+-- LazyVim normally loads:
+-- ~/.config/nvim/lua/config/keymaps.lua
 --
--- ██   ██ ███████ ██    ██ ███████
--- ██  ██  ██       ██  ██  ██
--- █████   █████     ████   ███████
--- ██  ██  ██         ██         ██
--- ██   ██ ███████    ██    ███████
---
--- ████████████████████████████████
+-- If this file is named keybindings.lua, import it from keymaps.lua:
+-- require("config.keybindings")
 
--- backstick
-vim.keymap.set("i", "<C-q>", "`", { desc = "Insert backtick" })
+local map = vim.keymap.set
 
--- ███████████████████████████████████████████
---
--- ███████ ███    ███  █████  ██████  ████████
--- ██      ████  ████ ██   ██ ██   ██    ██
--- ███████ ██ ████ ██ ███████ ██████     ██
---      ██ ██  ██  ██ ██   ██ ██   ██    ██
--- ███████ ██      ██ ██   ██ ██   ██    ██
---
--- ███████████████████████████████████████████
+-- ============================================================================
+-- KEYS
+-- ============================================================================
 
--- add new line bottom/top
-vim.keymap.set("n", "<CR>", "o<Esc>", { desc = "Add new line after" })
-vim.keymap.set("n", "<S-CR>", "O<Esc>", { desc = "Add new line before" })
+-- Insert backtick
+map("i", "<C-q>", "`", {
+  desc = "Insert backtick",
+})
+
+-- ============================================================================
+-- EDITING
+-- ============================================================================
+
+-- Add empty line without entering insert mode
+map("n", "<CR>", "o<Esc>", {
+  desc = "Add new line after",
+  silent = true,
+})
+
+map("n", "<S-CR>", "O<Esc>", {
+  desc = "Add new line before",
+  silent = true,
+})
 
 -- Save file
-vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<Esc>:w<CR>", { desc = "Save file" })
+map({ "n", "v" }, "<C-s>", "<Cmd>write<CR>", {
+  desc = "Save file",
+  silent = true,
+})
 
--- Reload config
-vim.keymap.set("n", "<Leader>rr", ":source $MYVIMRC<CR>", { desc = "Reload config" })
+map("i", "<C-s>", "<Esc><Cmd>write<CR>a", {
+  desc = "Save file",
+  silent = true,
+})
 
--- open or focus integrated Term (CTRL+SHIFT+T)
-vim.keymap.set("n", "<leader>t", function()
-  local terminals = {}
+-- Reload Neovim configuration
+map("n", "<Leader>rr", function()
+  vim.cmd("source $MYVIMRC")
+  vim.notify("Neovim configuration reloaded", vim.log.levels.INFO)
+end, {
+  desc = "Reload config",
+  silent = true,
+})
+
+-- ============================================================================
+-- INTEGRATED TERMINAL
+-- ============================================================================
+
+local function open_or_focus_terminal()
   for _, win in ipairs(vim.api.nvim_list_wins()) do
-    local buf = vim.api.nvim_win_get_buf(win)
-    if vim.bo[buf].buftype == "terminal" then
-      table.insert(terminals, win)
+    local buffer = vim.api.nvim_win_get_buf(win)
+
+    if vim.bo[buffer].buftype == "terminal" then
+      vim.api.nvim_set_current_win(win)
+      vim.cmd.startinsert()
+      return
     end
   end
 
-  if #terminals > 0 then
-    -- Ya hay al menos un terminal: hacemos foco al primero que encontramos
-    vim.api.nvim_set_current_win(terminals[1])
-  else
-    -- No hay terminal: lo creamos en un split inferior
-    vim.cmd("belowright split | terminal")
-    vim.cmd("resize 15")
-  end
+  vim.cmd("belowright split")
+  vim.cmd("terminal")
+  vim.cmd("resize 15")
+  vim.cmd.startinsert()
+end
 
-  vim.cmd("startinsert")
-end, { noremap = true, silent = true, desc = "Open/focus integrated terminal" })
+map("n", "<Leader>t", open_or_focus_terminal, {
+  desc = "Open/focus integrated terminal",
+  silent = true,
+})
 
--- █████████████████████████████████████████████████████████████████████████████
---
--- ███    ██  █████  ██    ██ ██  ██████   █████  ████████ ██  ██████  ███    ██
--- ████   ██ ██   ██ ██    ██ ██ ██       ██   ██    ██    ██ ██  ████ ████   ██
--- ██ ██  ██ ███████ ██    ██ ██ ██   ███ ███████    ██    ██ ██ ██ ██ ██ ██  ██
--- ██  ██ ██ ██   ██  ██  ██  ██ ██    ██ ██   ██    ██    ██ ████  ██ ██  ██ ██
--- ██   ████ ██   ██   ████   ██  ██████  ██   ██    ██    ██  ██████  ██   ████
---
--- ██████████████████████████████████████████████████████████████████████████████
+-- ============================================================================
+-- WINDOW NAVIGATION
+-- ============================================================================
 
--- Focus on Left/Right tab
-vim.api.nvim_set_keymap("n", "<C-S-Right>", "<C-w>l", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<C-S-Left>", "<C-w>h", { noremap = true, silent = true })
+map("n", "<C-h>", "<C-w>h", {
+  desc = "Go to left window",
+  silent = true,
+})
 
--- Window navigation
-vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window" })
-vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window" })
-vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window" })
-vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window" })
+map("n", "<C-j>", "<C-w>j", {
+  desc = "Go to lower window",
+  silent = true,
+})
 
--- GoTo next/prev buffer
-vim.keymap.set("n", "<Tab>", ":bnext<CR>", { desc = "Next buffer" })
-vim.keymap.set("n", "<S-Tab>", ":bprevious<CR>", { desc = "Previous buffer" })
+map("n", "<C-k>", "<C-w>k", {
+  desc = "Go to upper window",
+  silent = true,
+})
 
--- open vertical split of current file
-vim.keymap.set("n", "<C-n>", function()
-  --si hay un vertical split, lo usa, si no, lo creamos
+map("n", "<C-l>", "<C-w>l", {
+  desc = "Go to right window",
+  silent = true,
+})
+
+map("n", "<C-S-Left>", "<C-w>h", {
+  desc = "Go to left window",
+  silent = true,
+})
+
+map("n", "<C-S-Right>", "<C-w>l", {
+  desc = "Go to right window",
+  silent = true,
+})
+
+-- ============================================================================
+-- BUFFER NAVIGATION
+-- ============================================================================
+
+map("n", "<Tab>", "<Cmd>bnext<CR>", {
+  desc = "Next buffer",
+  silent = true,
+})
+
+map("n", "<S-Tab>", "<Cmd>bprevious<CR>", {
+  desc = "Previous buffer",
+  silent = true,
+})
+
+-- Open current buffer in a vertical split
+map("n", "<C-n>", function()
   vim.cmd("vsplit")
-  -- carga el mismo buffer en el nuevo split
-  vim.cmd("buffer #")
-end, { desc = "Vertical Split with current buffer" })
+end, {
+  desc = "Vertical split with current buffer",
+  silent = true,
+})
 
--- ████████████████████████████████████████████████████████████████████
+-- ============================================================================
+-- CLIPBOARD
 --
---  ██████ ██      ██ ██████  ██████   ██████   █████  ██████  ██████
---  ██      ██      ██ ██   ██ ██   ██ ██    ██ ██   ██ ██   ██ ██   ██
---  ██      ██      ██ ██████  ██████  ██    ██ ███████ ██████  ██   ██
---  ██      ██      ██ ██      ██   ██ ██    ██ ██   ██ ██   ██ ██   ██
---   ██████ ███████ ██ ██      ██████   ██████  ██   ██ ██   ██ ██████
---  __________________________________________________________________
--- | For UNDO/REDO Work add stty susp undef to your                   |
--- | .bashrc/.zshrc/.bash_profile                                     |
--- ████████████████████████████████████████████████████████████████████
+-- Requires:
+--   vim.g.clipboard = "osc52"
+--   vim.opt.clipboard = "unnamedplus"
+--
+-- With unnamedplus enabled, normal y/d/p operations already use the "+"
+-- clipboard. Explicit "+ operations are deliberately avoided here.
+-- ============================================================================
 
-local function copy_current_line_to_clipboard()
-  vim.cmd('normal! "+yy')
-end
+-- Copy current line
+map("n", "<C-c>", "yy", {
+  desc = "Copy line",
+  silent = true,
+})
 
-local function copy_selection_to_clipboard()
-  vim.cmd('normal! "+y')
-end
+-- Copy visual selection
+--
+-- `y` exits visual mode after copying, matching normal editor behaviour.
+map("x", "<C-c>", "y", {
+  desc = "Copy selection",
+  silent = true,
+})
 
-local function copy_current_line_from_insert()
-  local pos = vim.api.nvim_win_get_cursor(0)
+-- Select-mode copy
+map("s", "<C-c>", "<C-g>y", {
+  desc = "Copy selection",
+  silent = true,
+})
+
+-- Copy current line while staying in insert mode
+map("i", "<C-c>", function()
+  local cursor = vim.api.nvim_win_get_cursor(0)
+
   vim.cmd("stopinsert")
-  copy_current_line_to_clipboard()
-  vim.api.nvim_win_set_cursor(0, pos)
-  vim.cmd("startinsert")
-end
+  vim.cmd("normal! yy")
 
+  local line_count = vim.api.nvim_buf_line_count(0)
+  cursor[1] = math.min(cursor[1], line_count)
+
+  local line = vim.api.nvim_buf_get_lines(
+    0,
+    cursor[1] - 1,
+    cursor[1],
+    false
+  )[1] or ""
+
+  cursor[2] = math.min(cursor[2], #line)
+
+  vim.api.nvim_win_set_cursor(0, cursor)
+  vim.cmd("startinsert")
+end, {
+  desc = "Copy current line",
+  silent = true,
+})
+
+-- Paste after cursor
+map("n", "<C-v>", "p", {
+  desc = "Paste",
+  silent = true,
+})
+
+-- Replace visual selection without overwriting the clipboard
+map("x", "<C-v>", '"_dP', {
+  desc = "Paste over selection",
+  silent = true,
+})
+
+map("s", "<C-v>", '<C-g>"_dP', {
+  desc = "Paste over selection",
+  silent = true,
+})
+
+-- Paste in insert mode
+map("i", "<C-v>", "<C-r>+", {
+  desc = "Paste clipboard",
+  silent = true,
+})
+
+-- Paste in command-line mode
+map("c", "<C-v>", "<C-r>+", {
+  desc = "Paste clipboard",
+})
+
+-- Paste into an integrated terminal
 local function paste_into_terminal()
   local job_id = vim.b.terminal_job_id
+
   if not job_id then
-    vim.notify("No terminal job attached to this buffer", vim.log.levels.WARN)
+    vim.notify(
+      "No terminal job attached to this buffer",
+      vim.log.levels.WARN
+    )
     return
   end
 
-  vim.api.nvim_chan_send(job_id, vim.fn.getreg("+"))
+  local ok, clipboard = pcall(vim.fn.getreg, "+")
+
+  if not ok then
+    vim.notify(
+      "Could not read the system clipboard",
+      vim.log.levels.ERROR
+    )
+    return
+  end
+
+  if clipboard == "" then
+    return
+  end
+
+  vim.api.nvim_chan_send(job_id, clipboard)
 end
 
--- PASTE
-vim.keymap.set("i", "<C-v>", "<C-r>+", { noremap = true, silent = true })
-vim.keymap.set("c", "<C-v>", "<C-r>+", { noremap = true, silent = true })
-vim.keymap.set("n", "<C-v>", '"+p', { noremap = true, silent = true }) -- normal mode
-vim.keymap.set("v", "<C-v>", '"+p', { noremap = true, silent = true })
-vim.keymap.set("t", "<C-v>", paste_into_terminal, { noremap = true, silent = true, desc = "Paste clipboard into terminal" })
+map("t", "<C-v>", paste_into_terminal, {
+  desc = "Paste clipboard into terminal",
+  silent = true,
+})
 
--- SMART COPY
-vim.keymap.set("n", "<C-c>", copy_current_line_to_clipboard, { desc = "Copy line to clipboard", noremap = true, silent = true })
-vim.keymap.set({ "v", "x", "s" }, "<C-c>", copy_selection_to_clipboard, { desc = "Copy selection to clipboard", noremap = true, silent = true })
-vim.keymap.set("i", "<C-c>", copy_current_line_from_insert, { desc = "Copy line to clipboard", noremap = true, silent = true })
-
+-- ============================================================================
 -- SMART CUT
-vim.keymap.set({ "n", "v" }, "<C-x>", function()
-  local mode = vim.fn.mode()
-  if mode:match("[vV]") then
-    -- if visual mode, cut selection
-    vim.cmd('normal! "+x')
-  else
-    -- if normal mode, cut full line
-    vim.cmd('normal! "+dd')
-  end
-end, { desc = "Smart Cut", noremap = true, silent = true })
+-- ============================================================================
 
--- UNDO
-vim.keymap.set({ "n", "i" }, "<C-z>", "u", { desc = "Undo" })
+-- Cut current line in normal mode
+map("n", "<C-x>", "dd", {
+  desc = "Cut line",
+  silent = true,
+})
 
--- REDO
-vim.keymap.set({ "n", "i" }, "<C-y>", "<C-r>", { desc = "Redo" })
+-- Cut selected text in visual mode
+map("x", "<C-x>", "d", {
+  desc = "Cut selection",
+  silent = true,
+})
 
+map("s", "<C-x>", "<C-g>d", {
+  desc = "Cut selection",
+  silent = true,
+})
+
+-- ============================================================================
+-- UNDO / REDO
+-- ============================================================================
+
+map("n", "<C-z>", "u", {
+  desc = "Undo",
+  silent = true,
+})
+
+map("i", "<C-z>", "<C-o>u", {
+  desc = "Undo",
+  silent = true,
+})
+
+map("n", "<C-y>", "<C-r>", {
+  desc = "Redo",
+  silent = true,
+})
+
+map("i", "<C-y>", "<C-o><C-r>", {
+  desc = "Redo",
+  silent = true,
+})
+
+-- ============================================================================
 -- SELECT ALL
-local opts = { noremap = true, silent = true }
+-- ============================================================================
 
-vim.keymap.set({ "n", "v" }, "<C-a>", "ggVG", opts)
-vim.keymap.set("i", "<C-a>", "<Esc>ggVG", opts)
+map({ "n", "x" }, "<C-a>", "ggVG", {
+  desc = "Select all",
+  silent = true,
+})
 
--- ███████████████████████████████████████████████████████████████████████████████████████████████
---
--- ████████ ███████ ██   ██ ████████     ██   ██  █████  ███    ██ ██████  ██      ███████ ██████
---    ██    ██       ██ ██     ██        ██   ██ ██   ██ ████   ██ ██   ██ ██      ██      ██   ██
---    ██    █████     ███      ██        ███████ ███████ ██ ██  ██ ██   ██ ██      █████   ██████
---    ██    ██       ██ ██     ██        ██   ██ ██   ██ ██  ██ ██ ██   ██ ██      ██      ██   ██
---    ██    ███████ ██   ██    ██        ██   ██ ██   ██ ██   ████ ██████  ███████ ███████ ██   ██
---
--- ███████████████████████████████████████████████████████████████████████████████████████████████
+map("i", "<C-a>", "<Esc>ggVG", {
+  desc = "Select all",
+  silent = true,
+})
 
--- Go to start/end of line
-vim.api.nvim_set_keymap("i", "<C-S-Left>", "<C-o>^", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("i", "<C-S-Right>", "<C-o>$", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<C-S-Left>", "^", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<C-S-Right>", "g_", { noremap = true, silent = true })
+-- ============================================================================
+-- TEXT NAVIGATION
+-- ============================================================================
 
--- Move Up/Down
-vim.api.nvim_set_keymap("i", "<C-S-Up>", "<Esc>:m .-2<CR>==gi", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("i", "<C-S-Down>", "<Esc>:m .+1<CR>==gi", { noremap = true, silent = true })
+-- Start/end of line
+map("i", "<C-S-Left>", "<C-o>^", {
+  desc = "Go to start of line",
+  silent = true,
+})
 
-vim.keymap.set("v", "<C-S-Up>", ":m '<-2<CR>gv=gv", { desc = "Move selection up", silent = true })
-vim.keymap.set("v", "<C-S-Down>", ":m '>+1<CR>gv=gv", { desc = "Move selection down", silent = true })
+map("i", "<C-S-Right>", "<C-o>$", {
+  desc = "Go to end of line",
+  silent = true,
+})
 
--- Mantener selección después de indentar
-vim.keymap.set("v", "<", "<gv", { desc = "Left indent and keep selection" })
-vim.keymap.set("v", ">", ">gv", { desc = "Right indent and keep selection" })
+map("x", "<C-S-Left>", "^", {
+  desc = "Go to start of line",
+  silent = true,
+})
+
+map("x", "<C-S-Right>", "g_", {
+  desc = "Go to end of line",
+  silent = true,
+})
+
+-- ============================================================================
+-- MOVE LINES
+-- ============================================================================
+
+map("i", "<C-S-Up>", "<Esc><Cmd>move .-2<CR>==gi", {
+  desc = "Move line up",
+  silent = true,
+})
+
+map("i", "<C-S-Down>", "<Esc><Cmd>move .+1<CR>==gi", {
+  desc = "Move line down",
+  silent = true,
+})
+
+map("x", "<C-S-Up>", ":move '<-2<CR>gv=gv", {
+  desc = "Move selection up",
+  silent = true,
+})
+
+map("x", "<C-S-Down>", ":move '>+1<CR>gv=gv", {
+  desc = "Move selection down",
+  silent = true,
+})
+
+-- Keep selection after indenting
+map("x", "<", "<gv", {
+  desc = "Indent left and keep selection",
+  silent = true,
+})
+
+map("x", ">", ">gv", {
+  desc = "Indent right and keep selection",
+  silent = true,
+})
